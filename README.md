@@ -1,12 +1,30 @@
 
-`agnt-db` - A simple Clojure agent-based store for hash-map structures
+agnt-db - A simple Clojure agent-based store for hash-map structures
 ======================================================================
 
+A work in progress.
+
 The original goals of this project were to provide a simple mechanism for sharing clojure hash-map
-structures between threads with coordinated updates and also file based persistence of the maps.
+structures between threads with coordinated updates and also file-based persistence of the maps.
 
 The particular application which inspired the approach was a web app where users could
-register online for certain `resources`. More to follow...
+register online bookings for certain `resources`. A user could see which resources were
+available and which were already booked, then choose a free resource and attempt to 
+book it. If the resource was still available when the server received the request, great - the
+booking was made and confirmed in the response. If however in the mean time, someone else had
+booked that resource, the server had to say 'sorry, taken already - try again'.
+
+In practice, the requests were http requests, invoking a clojure handler which would perform
+the above processing and return the response. Each handler invocation would be on the container's
+particular request thread and would also perform side-affects such as persisting the state of 
+the bookings model to disk.
+
+This project is aimed at evolving a "clojure-spirited" way of dealing with this problem.
+
+The first pass is a clojure agent based approach, but we'll create a general api and may
+provide other (than agent) implementations in future. 
+
+Here's a simple example of the basic usage of agnt-db for the scenario above;
 
 
 Example usage
@@ -77,12 +95,24 @@ Example usage
     {:room1 {"Jul 02" {:am :free, :pm :free}, "Jul 01" {:am :joe, :pm :fred}}}
 
 
-Further Notes
--------------
+Further Notes (see source for details)
+--------------------------------------
+
+By having a single agent handle all the requests and using send-off/await, we are (hopefully) certain of
+each update being handled serially and appropriate blocking ensuring the disk persistence side effects are
+correctly coordinated.
+
+The use of agnt-upd and agnt-iswas *should* allow the esired semantics of the requirement to be met.
 
 Issues
 ------
 
+Discuss issues on agents, error handling, etc.
+
 Still To Do
 -----------
+
+- Proper test framework to verify the model under stress load.
+- Additional api functions (query, join, etc)
+- More sophisticated disk-persistence model (use of caching, indexing, etc
  
