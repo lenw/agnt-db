@@ -1,0 +1,1 @@
+#=(clojure.lang.PersistentArrayMap/create {:fred #=(clojure.lang.PersistentArrayMap/create {:uid :fred, :fname "Fred", :lname "Blogs"}), :joe #=(clojure.lang.PersistentArrayMap/create {:uid :joe, :fname "Joe", :lname "Soap"})})
